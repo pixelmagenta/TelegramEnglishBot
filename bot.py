@@ -1,10 +1,9 @@
 from datetime import datetime, date, time
 from envparse import env
-from telegram.ext import CommandHandler, ConversationHandler
-from telegram.ext import MessageHandler, Filters
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
-from telegram.ext import Updater
-from models import Student
+from telegram.ext import *
+from telegram import *
+from models import Student, Task
+from enum import Enum, auto
 import logging
 
 env.read_envfile()
@@ -15,12 +14,19 @@ updater = Updater(token=env('TOKEN'))
 
 dp = updater.dispatcher
 
-AUTH = 0
+
+class State(Enum):
+    AUTH = auto()
+    MENU = auto()
+    EX1 = auto()
+    EX2 = auto()
+    EX3 = auto()
+    EX4 = auto()
 
 def start(bot, update):
     update.message.reply_text(text="I'll help you improve your English :) \n\
         Write your invite code, please")
-    return AUTH
+    return State.AUTH
 
 def auth(bot, update):
     code = update.message.text
@@ -31,12 +37,53 @@ def auth(bot, update):
         update.message.reply_text(text="Invite code is invalid.")
     else:
         update.message.reply_text(text=f"Hi, {student.name}")
+    return menu(bot, update)
+
+def menu(bot, update):
+    reply_keyboard = [['Ex1', 'Ex2', 'Ex3', 'Ex4']]
+
+    update.message.reply_text(
+        'Here you can choose which exercise to complete. ',
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+    return State.MENU
+
+def menu_action(bot, update):
+    if update.message.text == 'Ex1':
+        task = Task.get()
+        update.message.reply_text(text=task.text)
+        return ex1(bot, update, task)
+    if update.message.text == 'Ex2':
+        return State.EX2
+    if update.message.text == 'Ex3':
+        return State.EX3
+    if update.message.text == 'Ex4':
+        return State.EX4
+
+def ex1(bot, update, task):
+    keyboard = [[InlineKeyboardButton(answer, callback_data=answer) for answer in task.data["blocks"][0]["answers"]]]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.message.reply_text(task.data["blocks"][0]["text"], reply_markup=reply_markup)
+    return State.EX1
+
+def ex1_handler(bot, update):
+    query = update.callback_query
+    print(query.data)
+    right_answer = 'may'
+    if query.data == right_answer:
+        query.message.reply_text(text="That's right :)")
+    if query.data != right_answer:
+        query.message.reply_text(text="That's not right :(")
+    return ex1(bot, update)
 
 conv_handler = ConversationHandler(
     entry_points=[CommandHandler('start', start)],
 
     states={
-        AUTH: [MessageHandler(Filters.text, auth)]
+        State.AUTH: [MessageHandler(Filters.text, auth)],
+        State.MENU: [RegexHandler('^(Ex1|Ex2|Ex3|Ex4)$', menu_action)],
+        State.EX1: [CallbackQueryHandler(ex1_handler)]
     },
 
     fallbacks=[]
