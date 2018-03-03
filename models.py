@@ -2,8 +2,9 @@ import json
 import os
 from datetime import date
 from playhouse.db_url import connect
+from playhouse.postgres_ext import *
 
-db = connect(os.environ.get['DATABASE'])
+db = connect(os.environ['DATABASE_URL'])
 
 
 class Topic(Model):
