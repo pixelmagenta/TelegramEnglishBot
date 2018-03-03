@@ -1,14 +1,13 @@
 import json
+import os
 from datetime import date
-from playhouse.postgres_ext import *
+from playhouse.db_url import connect
 
-db = PostgresqlExtDatabase('telegrambotdb', user='pixelmagenta', register_hstore=False)
+db = connect(os.environ.get['DATABASE'])
 
 
-class Student(Model):
-    user_id = IntegerField(null=True)
+class Topic(Model):
     name = CharField()
-    invite_code = CharField(unique=True)
 
     class Meta:
         database = db
@@ -17,6 +16,7 @@ class Student(Model):
 class Task(Model):
     text = TextField()
     data = JSONField()
+    topic = ForeignKeyField(Topic, on_delete='CASCADE', backref='tasks')
     available_at = DateField()
     due_to = DateField()
 
@@ -24,25 +24,37 @@ class Task(Model):
         database = db
 
 
+class Student(Model):
+    user_id = IntegerField(null=True)
+    name = CharField()
+    group = IntegerField()
+    invite_code = CharField(unique=True)
+    on_task = ForeignKeyField(Task, null=True)
+    on_stage = IntegerField(null=True)
+
+    class Meta:
+        database = db
+
+
+class Submission(Model):
+    student = ForeignKeyField(Student, on_delete='CASCADE', backref='submissions')
+    task = ForeignKeyField(Task)
+    data = JSONField()
+
+    class Meta:
+        database = db
+
+
 def create_tables():
-    Student.create_table()
+    Topic.create_table()
     Task.create_table()
-
-def create_task():
-    with open('text_ex1.json', 'r') as file:
-        data = json.loads(file.read())
-
-    with open('text_ex1.json', 'r') as file:
-        text = open('text1.txt', 'r').read()
-   
-    Task.create(text=text, data=data, available_at=date(2018, 2, 14), due_to=date(2018, 2, 24))
-
+    Student.create_table()
+    Submission.create_table()
 
 def create_users():
-    Student.create(name='Eugenia', invite_code='ABC123')
-    Student.create(name='Anna', invite_code='321CBA')
+    Student.create(name='Eugenia', group=151, invite_code='ABC123')
+    Student.create(name='Anna', group=151, invite_code='321CBA')
 
 if __name__ == '__main__':
     create_tables()
     create_users()
-    create_task()
