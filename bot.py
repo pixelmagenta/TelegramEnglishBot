@@ -1,16 +1,14 @@
 from datetime import datetime, date, time
-from envparse import env
 from telegram.ext import *
 from telegram import *
 from models import Student, Task
 from enum import Enum, auto
 import logging
-
-env.read_envfile()
+import os
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-updater = Updater(token=env('TOKEN'))
+updater = Updater(token=os.environ['TELEGRAM_TOKEN'])
 
 dp = updater.dispatcher
 
