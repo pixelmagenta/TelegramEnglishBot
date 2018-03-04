@@ -69,38 +69,54 @@ def menu_action(bot, update, student):
     if update.message.text == 'Ex1':
         task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & (Task.data["type"] == "choose_right")).get()
         update.message.reply_text(text=task.data["instructions"])
+        student.on_task = task
+        student.on_stage = 0
+        student.save()
         return ex1(bot, update, student)
     if update.message.text == 'Ex2':
         task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & (Task.data["type"] == "make_sentence")).get()
         update.message.reply_text(text=task.data["instructions"])
+        student.on_task = task
+        student.on_stage = 0
+        student.save()
         return ex2(bot, update, student)
     if update.message.text == 'Ex3':
         task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & (Task.data["type"] == "solve_problem")).get()
         update.message.reply_text(text=task.data["instructions"])
+        student.on_task = task
+        student.on_stage = 0
+        student.save()
         return ex3(bot, update, student)
 
-@registered
 def ex1(bot, update, student):
+    task=student.on_task
     update.message.reply_text(text=task.text)
-    keyboard = [[InlineKeyboardButton(answer, callback_data=answer) for answer in task.data["blocks"][0]["answers"]]]
+    block = task.data["blocks"][student.on_stage]
+    keyboard = [[InlineKeyboardButton(answer, callback_data=answer) for answer in block["answers"]]]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.message.reply_text(task.data["blocks"][0]["text"], reply_markup=reply_markup)
+    update.message.reply_text(block["text"], reply_markup=reply_markup)
     return State.EX1
 
 @registered
 def ex1_handler(bot, update, student):
     query = update.callback_query
-    print(query.data)
-    right_answer = task.data["blocks"][0]["correct"][0]
-    if query.data == right_answer:
+    task=student.on_task
+    block = task.data["blocks"][student.on_stage]
+    if query.data in block["correct"]:
         query.message.reply_text(text="That's right :)")
-    if query.data != right_answer:
+    else:
         query.message.reply_text(text="That's not right :(")
-    return ex1(bot, update)
+    if student.on_stage < len(task.data["blocks"]-1):
+        student.on_stage += 1
+        student.save()
+        return ex1(bot, update, student)
+    student.on_stage = None
+    student.on_task = None
+    student.save()
+    return menu(bot, update)
 
-@registered
 def ex2(bot, update, student):
     update.message.reply_text(task.data["blocks"][0]["text"])
     return State.EX2
@@ -114,7 +130,6 @@ def ex2_handler(bot, update, student):
         update.message.reply_text(text="That's not right :(")
     return ex2(bot, update, student)
 
-@registered
 def ex3(bot, update, student):
     update.message.reply_text(task.data["text"])
     return State.EX3
