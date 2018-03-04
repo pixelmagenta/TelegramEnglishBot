@@ -2,7 +2,7 @@ from datetime import datetime, date, time
 from functools import wraps
 from telegram.ext import *
 from telegram import *
-from models import Student, Task
+from models import *
 from enum import Enum, auto
 import logging
 import os
@@ -82,7 +82,7 @@ def menu_action(bot, update, student, message):
         student.on_task = task
         student.on_stage = 0
         student.save()
-        Submission.create(student=student, task=task, data={"answers":[]})
+        #Submission.create(student=student, task=task, data={"answers":[]})
         return ex1(update, student, message)
     if message.text == 'Ex2':
         task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & (Task.data["type"] == "make_sentence")).get()
@@ -90,7 +90,7 @@ def menu_action(bot, update, student, message):
         student.on_task = task
         student.on_stage = 0
         student.save()
-        Submission.create(student=student, task=task, data={"answers":[]})
+        #Submission.create(student=student, task=task, data={"answers":[]})
         return ex2(bot, update, student, message)
     if message.text == 'Ex3':
         task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & (Task.data["type"] == "solve_problem")).get()
@@ -98,7 +98,7 @@ def menu_action(bot, update, student, message):
         student.on_task = task
         student.on_stage = 0
         student.save()
-        Submission.create(student=student, task=task, data={"answers":[]})
+        #Submission.create(student=student, task=task, data={"answers":[]})
         return ex3(bot, update, student, message)
 
 def ex1(update, student, message):
