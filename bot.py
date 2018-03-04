@@ -164,12 +164,13 @@ conv_handler = ConversationHandler(
     states={
         State.AUTH: [MessageHandler(Filters.text, auth)],
         State.MENU: [RegexHandler('^(Ex1|Ex2|Ex3)$', menu_action)],
-        State.EX1: [CallbackQueryHandler(ex1_handler, per_message=True)],
+        State.EX1: [CallbackQueryHandler(ex1_handler)],
         State.EX2: [MessageHandler(Filters.text, ex2_handler)],
         State.EX3: [MessageHandler(Filters.text, ex3_handler)]
     },
 
-    fallbacks=[]
+    fallbacks=[], per_message=True
+
 )
 
 dp.add_handler(conv_handler)
