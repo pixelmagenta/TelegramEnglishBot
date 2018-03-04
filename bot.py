@@ -69,11 +69,11 @@ def menu_action(bot, update, student):
     if update.message.text == 'Ex1':
         task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & (Task.data["type"] == "choose_right")).get()
         update.message.reply_text(text=task.data["instructions"])
-        update.message.reply_text(text=task.text)
+            update.message.reply_text(text=task.text)
         student.on_task = task
         student.on_stage = 0
         student.save()
-        return ex1(bot, update, student)
+        return ex1(update.message, student)
     if update.message.text == 'Ex2':
         task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & (Task.data["type"] == "make_sentence")).get()
         update.message.reply_text(text=task.data["instructions"])
@@ -89,7 +89,7 @@ def menu_action(bot, update, student):
         student.save()
         return ex3(bot, update, student)
 
-def ex1(bot, update, student):
+def ex1(message, student):
     task=student.on_task
     block = task.data["blocks"][student.on_stage]
     keyboard = [[InlineKeyboardButton(answer, callback_data=answer) for answer in block["answers"]]]
@@ -111,7 +111,7 @@ def ex1_handler(bot, update, student):
     if student.on_stage < len(task.data["blocks"])-1:
         student.on_stage += 1
         student.save()
-        return ex1(bot, update, student)
+        return ex1(query.message, student)
     student.on_stage = None
     student.on_task = None
     student.save()
