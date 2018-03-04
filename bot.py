@@ -175,7 +175,7 @@ def ex3_handler(bot, update, student, message):
     if answer in block["correct"]:
         message.reply_text(text="That's right :)")
     else:
-        message.reply_text(text=f"That's not right :(\nThe right answer(s): {task.data["correct"]}")
+        message.reply_text(text=f"That's not right :(\nThe right answer(s): {', '.join(block['correct'])}")
     if student.on_stage < len(task.data["blocks"])-1:
         student.on_stage += 1
         student.save()
