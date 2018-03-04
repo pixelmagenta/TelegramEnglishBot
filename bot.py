@@ -114,7 +114,7 @@ def ex1_handler(bot, update, student, message):
     query = update.callback_query
     task=student.on_task
     block = task.data["blocks"][student.on_stage]
-    sub = Submission.get_or_create(student=student, task=task)
+    sub, created = Submission.get_or_create(student=student, task=task)
     sub.answers.append(query.data)
     sub.save()
     if query.data in block["correct"]:
@@ -142,7 +142,7 @@ def ex2_handler(bot, update, student, message):
     answer = message.text
     task = student.on_task
     block = task.data["blocks"][student.on_stage]
-    sub = Submission.get_or_create(student=student, task=task)
+    sub, created = Submission.get_or_create(student=student, task=task)
     sub.answers.append(answer)
     sub.save()
     if answer in block["correct"]:
@@ -168,7 +168,7 @@ def ex3(bot, update, student, message):
 def ex3_handler(bot, update, student, message):
     answer = message.text
     task=student.on_task
-    sub = Submission.get_or_create(student=student, task=task)
+    sub, created = Submission.get_or_create(student=student, task=task)
     sub.answers.append(answer)
     sub.save()
     if answer == task.data["correct"]:
