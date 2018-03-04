@@ -111,7 +111,7 @@ def ex1(update, student, message):
 @registered
 @needs_mesage
 def ex1_handler(bot, update, student, message):
-    query = update.callback_data
+    query = update.callback_query
     print(query)
     task=student.on_task
     block = task.data["blocks"][student.on_stage]
