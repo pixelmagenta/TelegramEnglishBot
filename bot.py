@@ -67,15 +67,15 @@ def menu(bot, update, student):
 @registered
 def menu_action(bot, update, student):
     if update.message.text == 'Ex1':
-        task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & Task.data["type"] == "choose_right").get()
+        task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & (Task.data["type"] == "choose_right")).get()
         update.message.reply_text(text=task.data["instructions"])
         return ex1(bot, update, student)
     if update.message.text == 'Ex2':
-        task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & Task.data["type"] == "make sentence").get()
+        task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & (Task.data["type"] == "make sentence")).get()
         update.message.reply_text(text=task.data["instructions"])
         return ex2(bot, update, student)
     if update.message.text == 'Ex3':
-        task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & Task.data["type"] == "solve_problem").get()
+        task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & (Task.data["type"] == "solve_problem")).get()
         update.message.reply_text(text=task.data["instructions"])
         return ex3(bot, update, student)
 
