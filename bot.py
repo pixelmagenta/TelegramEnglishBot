@@ -101,11 +101,11 @@ def ex1(update, student):
 
 @registered
 def ex1_handler(bot, update, student):
-    query = update.effective_message.text
+    query = update.callback_data
     print(query)
     task=student.on_task
     block = task.data["blocks"][student.on_stage]
-    if query in block["correct"]:
+    if query.data in block["correct"]:
         update.effective_message.reply_text(text="That's right :)")
     else:
         update.effective_message.reply_text(text="That's not right :(")
