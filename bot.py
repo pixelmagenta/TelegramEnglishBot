@@ -8,7 +8,10 @@ import os
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-updater = Updater(token=os.environ['TELEGRAM_TOKEN'])
+APP_NAME = os.environ['APP_NAME']
+TOKEN = os.environ['TELEGRAM_TOKEN']
+PORT = int(os.environ.get('PORT', '8443'))
+updater = Updater(token=TOKEN)
 
 dp = updater.dispatcher
 
@@ -89,5 +92,8 @@ conv_handler = ConversationHandler(
 
 dp.add_handler(conv_handler)
 
-
-updater.start_polling()
+updater.start_webhook(listen="0.0.0.0",
+                      port=PORT,
+                      url_path=TOKEN)
+updater.bot.set_webhook(f"https://{APP_NAME}.herokuapp.com/{TOKEN}")
+updater.idle()
