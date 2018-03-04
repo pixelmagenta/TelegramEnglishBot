@@ -52,11 +52,6 @@ def create_tables():
     Student.create_table()
     Submission.create_table()
 
-def create_users():
-    Student.create(name='Eugenia', group=151, invite_code='ABC123')
-    Student.create(name='Anna', group=151, invite_code='321CBA')
-
 if __name__ == '__main__':
     # create_tables()
-    # create_users()
     Submission.create_table()
