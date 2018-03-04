@@ -144,17 +144,18 @@ def ex2_handler(bot, update, student):
     return menu(bot, update)
 
 def ex3(bot, update, student):
-    update.message.reply_text(task.data["text"])
+    task=student.on_task
+    update.message.reply_text(task["text"])
     return State.EX3
 
 @registered
 def ex3_handler(bot, update, student):
     answer = update.message.text
-    if answer == task.data["correct"]:
+    if answer == task["correct"]:
         update.message.reply_text(text="That's right :)")
     else:
         update.message.reply_text(text="That's not right :(")
-    return menu(bot, update, student)
+    return menu(bot, update)
 
 conv_handler = ConversationHandler(
     entry_points=[CommandHandler('start', start)],
