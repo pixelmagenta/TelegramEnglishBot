@@ -40,7 +40,7 @@ class Student(Model):
 class Submission(Model):
     student = ForeignKeyField(Student, on_delete='CASCADE', backref='submissions')
     task = ForeignKeyField(Task)
-    answers = ArrayField(CharField)
+    answers = ArrayField(CharField, default=[])
 
     class Meta:
         database = db
