@@ -151,6 +151,7 @@ def ex3(bot, update, student):
 @registered
 def ex3_handler(bot, update, student):
     answer = update.message.text
+    task=student.on_task
     if answer == task.data["correct"]:
         update.message.reply_text(text="That's right :)")
     else:
