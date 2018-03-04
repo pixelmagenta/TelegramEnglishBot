@@ -82,6 +82,7 @@ def menu_action(bot, update, student, message):
         student.on_task = task
         student.on_stage = 0
         student.save()
+        Submission.create(student=student, task=task, data={"answers":[]})
         return ex1(update, student, message)
     if message.text == 'Ex2':
         task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & (Task.data["type"] == "make_sentence")).get()
@@ -89,6 +90,7 @@ def menu_action(bot, update, student, message):
         student.on_task = task
         student.on_stage = 0
         student.save()
+        Submission.create(student=student, task=task, data={"answers":[]})
         return ex2(bot, update, student, message)
     if message.text == 'Ex3':
         task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & (Task.data["type"] == "solve_problem")).get()
@@ -96,6 +98,7 @@ def menu_action(bot, update, student, message):
         student.on_task = task
         student.on_stage = 0
         student.save()
+        Submission.create(student=student, task=task, data={"answers":[]})
         return ex3(bot, update, student, message)
 
 def ex1(update, student, message):
@@ -112,13 +115,12 @@ def ex1(update, student, message):
 @needs_mesage
 def ex1_handler(bot, update, student, message):
     query = update.callback_query
-    print(query)
     task=student.on_task
     block = task.data["blocks"][student.on_stage]
     if query.data in block["correct"]:
         message.reply_text(text="That's right :)")
     else:
-        message.reply_text(text="That's not right :(")
+        message.reply_text(text=f"That's not right :(\nThe right answer(s): {block['correct']}")
     if student.on_stage < len(task.data["blocks"])-1:
         student.on_stage += 1
         student.save()
