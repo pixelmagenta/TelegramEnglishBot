@@ -96,7 +96,7 @@ def ex1(update, student):
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.message.reply_text(block["text"], reply_markup=reply_markup)
+    update.effective_message.reply_text(block["text"], reply_markup=reply_markup)
     return State.EX1
 
 @registered
