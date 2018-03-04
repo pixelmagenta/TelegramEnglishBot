@@ -45,7 +45,7 @@ class State(Enum):
 @needs_mesage
 def start(bot, update, message):
     message.reply_text(text="I'll help you improve your English :) \n\
-        Write your invite code, please")
+        Write your invitation code, please")
     return State.AUTH
 
 @needs_mesage
@@ -57,7 +57,7 @@ def auth(bot, update, message):
         student.user_id = update.effective_chat.id
         student.save()
     except Student.DoesNotExist:
-        message.reply_text(text="Invite code is invalid.")
+        message.reply_text(text="Invitation code is invalid.")
     else:
         message.reply_text(text=f"Hi, {student.name}")
     return menu(bot, update)
