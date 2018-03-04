@@ -159,8 +159,8 @@ def ex2_handler(bot, update, student, message):
     return menu(bot, update)
 
 def ex3(bot, update, student, message):
-    task=student.on_task
-    message.reply_text(task.data["text"])
+    block = student.on_task.data["blocks"][student.on_stage]
+    message.reply_text(block["text"])
     return State.EX3
 
 @registered
