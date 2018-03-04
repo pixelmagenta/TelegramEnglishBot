@@ -120,7 +120,7 @@ def ex1_handler(bot, update, student, message):
     if query.data in block["correct"]:
         message.reply_text(text="That's right :)")
     else:
-        message.reply_text(text=f"That's not right :(\nThe right answer(s): {', ',join(block['correct'])}")
+        message.reply_text(text=f"That's not right :(\nThe right answer(s): {', '.join(block['correct'])}")
     if student.on_stage < len(task.data["blocks"])-1:
         student.on_stage += 1
         student.save()
