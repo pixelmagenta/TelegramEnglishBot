@@ -57,4 +57,4 @@ if __name__ == '__main__':
     if sys.argv[1] == 'import_users':
         for user in json.loads(sys.argv[2])['users']:
             Student.create(name=user['name'], group=user['group'],
-                    invite_code=base64.b64encode(os.urandom(6)))
+                    invite_code=b64encode(os.urandom(6)))
