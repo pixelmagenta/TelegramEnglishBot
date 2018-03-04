@@ -69,6 +69,7 @@ def menu_action(bot, update, student):
     if update.message.text == 'Ex1':
         task=Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()) & (Task.data["type"] == "choose_right")).get()
         update.message.reply_text(text=task.data["instructions"])
+        update.message.reply_text(text=task.text)
         student.on_task = task
         student.on_stage = 0
         student.save()
@@ -90,7 +91,6 @@ def menu_action(bot, update, student):
 
 def ex1(bot, update, student):
     task=student.on_task
-    update.message.reply_text(text=task.text)
     block = task.data["blocks"][student.on_stage]
     keyboard = [[InlineKeyboardButton(answer, callback_data=answer) for answer in block["answers"]]]
 
