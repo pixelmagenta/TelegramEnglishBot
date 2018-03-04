@@ -40,7 +40,7 @@ class Student(Model):
 class Submission(Model):
     student = ForeignKeyField(Student, on_delete='CASCADE', backref='submissions')
     task = ForeignKeyField(Task)
-    data = JSONField()
+    answers = ArrayField(CharField)
 
     class Meta:
         database = db
@@ -57,5 +57,6 @@ def create_users():
     Student.create(name='Anna', group=151, invite_code='321CBA')
 
 if __name__ == '__main__':
-    create_tables()
-    create_users()
+    # create_tables()
+    # create_users()
+    Submission.create_table()
