@@ -96,7 +96,7 @@ def ex1(message, student):
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    message.reply_text(block["text"], reply_markup=reply_markup)
+    update.message.reply_text(block["text"], reply_markup=reply_markup)
     return State.EX1
 
 @registered
@@ -115,6 +115,7 @@ def ex1_handler(bot, update, student):
     student.on_stage = None
     student.on_task = None
     student.save()
+    update.message.reply_text(text="Exercise 1 is finished.")
     return menu(bot, update)
 
 def ex2(bot, update, student):
