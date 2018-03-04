@@ -127,7 +127,7 @@ def ex1_handler(bot, update, student, message):
     student.on_task = None
     student.save()
     message.reply_text(text="Exercise 1 is finished.")
-    return menu(bot, update, message)
+    return menu(bot, update)
 
 def ex2(bot, update, student, message):
     block = student.on_task.data["blocks"][student.on_stage]
@@ -151,7 +151,7 @@ def ex2_handler(bot, update, student, message):
     student.on_stage = None
     student.on_task = None
     student.save()
-    return menu(bot, update, message)
+    return menu(bot, update)
 
 def ex3(bot, update, student, message):
     task=student.on_task
@@ -167,7 +167,7 @@ def ex3_handler(bot, update, student, message):
         message.reply_text(text="That's right :)")
     else:
         message.reply_text(text="That's not right :(")
-    return menu(bot, update, message)
+    return menu(bot, update)
 
 conv_handler = ConversationHandler(
     entry_points=[CommandHandler('start', start)],
