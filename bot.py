@@ -105,9 +105,9 @@ def ex1_handler(bot, update, student):
     task=student.on_task
     block = task.data["blocks"][student.on_stage]
     if query in block["correct"]:
-        update.message.reply_text(text="That's right :)")
+        update.effective_message.reply_text(text="That's right :)")
     else:
-        update.message.reply_text(text="That's not right :(")
+        update.effective_message.reply_text(text="That's not right :(")
     if student.on_stage < len(task.data["blocks"])-1:
         student.on_stage += 1
         student.save()
@@ -115,7 +115,7 @@ def ex1_handler(bot, update, student):
     student.on_stage = None
     student.on_task = None
     student.save()
-    update.message.reply_text(text="Exercise 1 is finished.")
+    update.effective_message.reply_text(text="Exercise 1 is finished.")
     return menu(bot, update)
 
 def ex2(bot, update, student):
