@@ -119,17 +119,29 @@ def ex1_handler(bot, update, student):
     return menu(bot, update)
 
 def ex2(bot, update, student):
-    update.message.reply_text(task.data["blocks"][0]["text"])
+    task=student.on_task
+    block = task.data["blocks"][student.on_stage]
+    update.message.reply_text(block["text"])
     return State.EX2
 
 @registered
 def ex2_handler(bot, update, student):
     answer = update.message.text
-    if answer in task.data["blocks"][0]["correct"]:
+    task=student.on_task
+    block = task.data["blocks"][student.on_stage]
+    if answer in block["correct"]:
         update.message.reply_text(text="That's right :)")
     else:
         update.message.reply_text(text="That's not right :(")
-    return ex2(bot, update, student)
+    if student.on_stage < len(task.data["blocks"])-1:
+        student.on_stage += 1
+        student.save()
+        return ex2(bot, update, student)
+    student.on_stage = None
+    student.on_task = None
+    student.save()
+    ##update.message.reply_text(text="Exercise 1 is finished.")
+    return menu(bot, update)
 
 def ex3(bot, update, student):
     update.message.reply_text(task.data["text"])
