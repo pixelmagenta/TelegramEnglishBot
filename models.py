@@ -1,5 +1,6 @@
 import json
 import os
+from base64 import b64encode
 from datetime import date
 from playhouse.db_url import connect
 from playhouse.postgres_ext import *
@@ -53,5 +54,7 @@ def create_tables():
     Submission.create_table()
 
 if __name__ == '__main__':
-    # create_tables()
-    Submission.create_table()
+    if sys.argv[1] == 'import_users':
+        for user in json.loads(sys.argv[2])['users']:
+            Student.create(name=user['name'], group=user['group'],
+                    invite_code=base64.b64encode(os.urandom(6)))
