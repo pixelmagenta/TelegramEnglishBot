@@ -102,6 +102,7 @@ def ex1(update, student):
 @registered
 def ex1_handler(bot, update, student):
     query = update.effective_message.text
+    print(query)
     task=student.on_task
     block = task.data["blocks"][student.on_stage]
     if query in block["correct"]:
