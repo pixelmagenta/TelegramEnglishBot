@@ -1,4 +1,5 @@
 from datetime import datetime, date, time
+from functools import wraps
 from telegram.ext import *
 from telegram import *
 from models import Student, Task
@@ -15,6 +16,19 @@ updater = Updater(token=TOKEN)
 
 dp = updater.dispatcher
 
+def registered(func):
+    @wraps(func)
+    def wrapped(bot, update, *args, **kwargs):
+        try:
+            student = Student.get(user_id=update.effective_chat.id)
+        except Student.DoesNotExist:
+            update.message.reply_text('You are not registered yet.\n'+
+                                        'Write your invite code, please')
+            return State.AUTH
+        else:
+            return func(bot, update, student, *args, **kwargs)
+    return wrapped
+
 
 class State(Enum):
     AUTH = auto()
@@ -22,7 +36,6 @@ class State(Enum):
     EX1 = auto()
     EX2 = auto()
     EX3 = auto()
-    EX4 = auto()
 
 def start(bot, update):
     update.message.reply_text(text="I'll help you improve your English :) \n\
@@ -34,33 +47,42 @@ def auth(bot, update):
     print(code)
     try:
         student = Student.get(invite_code=code.strip())
+        student.user_id = update.effective_chat.id
+        student.save()
     except Student.DoesNotExist:
         update.message.reply_text(text="Invite code is invalid.")
     else:
         update.message.reply_text(text=f"Hi, {student.name}")
     return menu(bot, update)
 
-def menu(bot, update):
-    reply_keyboard = [['Ex1', 'Ex2', 'Ex3', 'Ex4']]
+@registered
+def menu(bot, update, student):
+    reply_keyboard = [['Ex1', 'Ex2', 'Ex3']]
 
     update.message.reply_text(
         'Here you can choose which exercise to complete. ',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     return State.MENU
 
-def menu_action(bot, update):
+@registered
+def menu_action(bot, update, student):
+    tasks = Task.select().where((Task.available_at <= datetime.now()) & (Task.due_to >= datetime.now()))
     if update.message.text == 'Ex1':
-        task = Task.get()
-        update.message.reply_text(text=task.text)
-        return ex1(bot, update, task)
+        task=Task.select().from_(tasks).where(Task.data["type"] == "choose_right")
+        update.message.reply_text(text=task.data["instructions"])
+        return ex1(bot, update, student)
     if update.message.text == 'Ex2':
-        return State.EX2
+        task=Task.select().from_(tasks).where(Task.data["type"] == "make sentence")
+        update.message.reply_text(text=task.data["instructions"])
+        return ex2(bot, update, student)
     if update.message.text == 'Ex3':
-        return State.EX3
-    if update.message.text == 'Ex4':
-        return State.EX4
+        task=Task.select().from_(tasks).where(Task.data["type"] == "solve_problem")
+        update.message.reply_text(text=task.data["instructions"])
+        return ex3(bot, update, student)
 
-def ex1(bot, update, task):
+@registered
+def ex1(bot, update, student):
+    update.message.reply_text(text=task.text)
     keyboard = [[InlineKeyboardButton(answer, callback_data=answer) for answer in task.data["blocks"][0]["answers"]]]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -68,23 +90,54 @@ def ex1(bot, update, task):
     update.message.reply_text(task.data["blocks"][0]["text"], reply_markup=reply_markup)
     return State.EX1
 
-def ex1_handler(bot, update):
+@registered
+def ex1_handler(bot, update, student):
     query = update.callback_query
     print(query.data)
-    right_answer = 'may'
+    right_answer = task.data["blocks"][0]["correct"][0]
     if query.data == right_answer:
         query.message.reply_text(text="That's right :)")
     if query.data != right_answer:
         query.message.reply_text(text="That's not right :(")
     return ex1(bot, update)
 
+@registered
+def ex2(bot, update, student):
+    update.message.reply_text(task.data["blocks"][0]["text"])
+    return State.EX2
+
+@registered
+def ex2_handler(bot, update, student):
+    answer = update.message.text
+    if answer in task.data["blocks"][0]["correct"]:
+        update.message.reply_text(text="That's right :)")
+    else:
+        update.message.reply_text(text="That's not right :(")
+    return ex2(bot, update, student)
+
+@registered
+def ex3(bot, update, student):
+    update.message.reply_text(task.data["text"])
+    return State.EX3
+
+@registered
+def ex3_handler(bot, update, student):
+    answer = update.message.text
+    if answer == task.data["correct"]:
+        update.message.reply_text(text="That's right :)")
+    else:
+        update.message.reply_text(text="That's not right :(")
+    return menu(bot, update, student)
+
 conv_handler = ConversationHandler(
     entry_points=[CommandHandler('start', start)],
 
     states={
         State.AUTH: [MessageHandler(Filters.text, auth)],
-        State.MENU: [RegexHandler('^(Ex1|Ex2|Ex3|Ex4)$', menu_action)],
+        State.MENU: [RegexHandler('^(Ex1|Ex2|Ex3)$', menu_action)],
         State.EX1: [CallbackQueryHandler(ex1_handler)]
+        State.EX2: [MessageHandler(Filters.text, ex2_handler)]
+        State.EX3: [MessageHandler(Filters.text, ex3_handler)]
     },
 
     fallbacks=[]
