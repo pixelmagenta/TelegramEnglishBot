@@ -141,7 +141,6 @@ def ex2_handler(bot, update, student):
     student.on_stage = None
     student.on_task = None
     student.save()
-    ##update.message.reply_text(text="Exercise 1 is finished.")
     return menu(bot, update)
 
 def ex3(bot, update, student):
@@ -165,7 +164,7 @@ conv_handler = ConversationHandler(
     states={
         State.AUTH: [MessageHandler(Filters.text, auth)],
         State.MENU: [RegexHandler('^(Ex1|Ex2|Ex3)$', menu_action)],
-        State.EX1: [CallbackQueryHandler(ex1_handler)],
+        State.EX1: [CallbackQueryHandler(ex1_handler, per_message=True)],
         State.EX2: [MessageHandler(Filters.text, ex2_handler)],
         State.EX3: [MessageHandler(Filters.text, ex3_handler)]
     },
