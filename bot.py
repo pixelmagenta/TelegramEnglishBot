@@ -4,16 +4,12 @@ from telegram.ext import *
 from telegram import *
 from models import *
 from enum import Enum, auto
+import settings
 import logging
-import os
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-APP_NAME = os.environ['APP_NAME']
-TOKEN = os.environ['TELEGRAM_TOKEN']
-PORT = int(os.environ.get('PORT', '8443'))
-updater = Updater(token=TOKEN)
-
+updater = Updater(token=settings.TOKEN)
 dp = updater.dispatcher
 
 def registered(func):
@@ -201,9 +197,11 @@ conv_handler = ConversationHandler(
 )
 
 dp.add_handler(conv_handler)
-
-updater.start_webhook(listen="0.0.0.0",
-                      port=PORT,
-                      url_path=TOKEN)
-updater.bot.set_webhook(f"https://{APP_NAME}.herokuapp.com/{TOKEN}")
+if settings.DEBUG:
+    updater.start_polling()
+else:
+    updater.start_webhook(listen="0.0.0.0",
+                          port=settings.PORT,
+                          url_path=settings.TOKEN)
+    updater.bot.set_webhook(f"https://{settings.APP_NAME}.herokuapp.com/{settings.TOKEN}")
 updater.idle()

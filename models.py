@@ -1,12 +1,13 @@
 import json
 import os
 import sys
+import settings
 from base64 import b64encode
 from datetime import date
 from playhouse.db_url import connect
 from playhouse.postgres_ext import *
 
-db = connect(os.environ['DATABASE_URL'])
+db = connect(settings.DATABASE_URL)
 
 
 class Topic(Model):
