@@ -45,6 +45,7 @@ class Submission(Model):
     task = ForeignKeyField(Task)
     answers = ArrayField(CharField, default=[])
     is_completed = BooleanField(default=False)
+    mark = IntegerField(null=True)
 
     class Meta:
         database = db
