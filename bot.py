@@ -26,7 +26,9 @@ def registered(func):
                 message.reply_text('Invalid code.\n'+
                                         'Try again.')
             else:
-                message.reply_text(f'Welcome, {student.name}!')
+                message.reply_text(f'Welcome, {student.name}!\n'+
+                                    'Dear students, there is a Beta-version of the Bot now. So, please, be attentive to spaces, register and all of the punctuation marks in your answers. It is better to copy-paste fragments from tasks into your answers. Also, please, answer on the task with puzzle just by one number or word. If you have any question, write here @eugeniaustinova')
+                show_help(bot, update)
                 show_menu(bot, update)
         else:
             return func(bot, update, message, student, *args, **kwargs)
@@ -135,7 +137,22 @@ def logout(bot, update, message, student):
     student.save()
     message.reply_text('Logged out successfully!')
 
+@registered
+def show_help(bot, update, message, student):
+     text = " The following commands are available:\n"
+
+        commands = [["/menu", "Show available tasks"],
+                    ["/help", "Show this help"],
+                    ["/logout", "Cancel all activities and logout"]
+                    ]
+
+        for command in commands:
+            text += command[0] + " " + command[1] + "\n"
+    update.message.reply_text(text)
+
+
 dp.add_handler(CommandHandler('start', start))
+dp.add_handler(CommandHandler('help', show_help))
 dp.add_handler(CommandHandler('menu', show_menu))
 dp.add_handler(CommandHandler('logout', logout))
 dp.add_handler(MessageHandler(Filters.text, main_handler))
