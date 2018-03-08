@@ -139,8 +139,8 @@ def logout(bot, update, message, student):
 
 @registered
 def show_help(bot, update, message, student):
-     text = " The following commands are available:\n"
-     commands = [["/menu", "Show available tasks"],
+    text = " The following commands are available:\n"
+    commands = [["/menu", "Show available tasks"],
             ["/help", "Show this help"],
             ["/logout", "Cancel all activities and logout"]
             ]
