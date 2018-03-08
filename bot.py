@@ -48,6 +48,12 @@ def show_task(bot, update, message, student):
 
 def task_handler(bot, update, message, student):
     task = student.on_task
+    if task.due_to < datetime.now().date():
+        message.reply_text('Task is not available anymore')
+        student.on_task = None
+        student.on_stage = None
+        student.save()
+        return
     block = task.data['blocks'][student.on_stage]
     if update.callback_query:
         student_answer = update.callback_query.data
@@ -71,18 +77,26 @@ def task_handler(bot, update, message, student):
         student.on_stage = None
         student.on_task = None
         student.save()
+        sub.is_completed = True
+        sub.save()
+        message.reply_text(text="Task completed!")
         show_menu(bot, update)
     
 @registered
 def show_menu(bot, update, message, student):
-    available_tasks = Task.select().where((Task.available_at <= datetime.now()) &
-                                            (Task.due_to >= datetime.now()))
-    keyboard = [[InlineKeyboardButton(task.data['type'], callback_data=task.id)
-                    for task in available_tasks]]
+    completed = Task.select().join(Submission).where((Submission.student == student) & Submission.is_completed)
+    available_tasks = Task.select().where((Task.available_at <= datetime.now().date()) &
+                                            (Task.due_to >= datetime.now().date()) &
+                                            Task.id.not_in(completed))
+    if available_tasks.count() > 0:
+        keyboard = [[InlineKeyboardButton(task.data['type'], callback_data=task.id)
+                        for task in available_tasks]]
 
-    message.reply_text(
-        'Here you can choose which exercise to complete. ',
-        reply_markup=InlineKeyboardMarkup(keyboard))
+        message.reply_text(
+            'Here you can choose which exercise to complete. ',
+            reply_markup=InlineKeyboardMarkup(keyboard))
+    else:
+        message.reply_text('No tasks to solve.\nCome back next week!')
 
 def menu_handler(bot, update, message, student):
     update.callback_query.answer()
@@ -91,8 +105,17 @@ def menu_handler(bot, update, message, student):
     except Task.DoesNotExist:
         message.reply_text('Invalid task')
         return
+    if task.available_at > datetime.now().date():
+        message.reply_text('Task is not available yet')
+        return
+    if task.due_to < datetime.now().date():
+        message.reply_text('Task is not available anymore')
+        return
+
+    sub, created = Submission.get_or_create(student=student, task=task)
+
     student.on_task = task
-    student.on_stage = 0
+    student.on_stage = len(sub.answers)
     student.save()
     message.reply_text(task.data["instructions"])
     show_task(bot, update, message, student)

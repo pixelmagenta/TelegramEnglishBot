@@ -44,6 +44,7 @@ class Submission(Model):
     student = ForeignKeyField(Student, on_delete='CASCADE', backref='submissions')
     task = ForeignKeyField(Task)
     answers = ArrayField(CharField, default=[])
+    is_completed = BooleanField(default=False)
 
     class Meta:
         database = db
