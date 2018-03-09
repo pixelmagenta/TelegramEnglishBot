@@ -14,7 +14,11 @@ dp = updater.dispatcher
 def registered(func):
     @wraps(func)
     def wrapped(bot, update, *args, **kwargs):
-        message = update.message or update.callback_query.message
+        if update.callback_query:
+            message = update.callback_query.message
+            update.callback_query.answer()
+        else:
+            message = update.message
         try:
             student = Student.get(user_id=update.effective_chat.id)
         except Student.DoesNotExist:
@@ -101,8 +105,6 @@ def show_menu(bot, update, message, student):
         message.reply_text('No tasks to solve.\nCome back next week!')
 
 def menu_handler(bot, update, message, student):
-    if update.callback_query:
-        update.callback_query.answer()
     try:
         task = Task[update.callback_query.data]
     except Task.DoesNotExist:
