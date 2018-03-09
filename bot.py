@@ -115,6 +115,9 @@ def menu_handler(bot, update, message, student):
         return
 
     sub, created = Submission.get_or_create(student=student, task=task)
+    if sub.is_completed:
+        message.reply_text('You have already completed this task!')
+        return
 
     student.on_task = task
     student.on_stage = len(sub.answers)
