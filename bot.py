@@ -101,7 +101,8 @@ def show_menu(bot, update, message, student):
         message.reply_text('No tasks to solve.\nCome back next week!')
 
 def menu_handler(bot, update, message, student):
-    update.callback_query.answer()
+    if update.callback_query:
+        update.callback_query.answer()
     try:
         task = Task[update.callback_query.data]
     except Task.DoesNotExist:
