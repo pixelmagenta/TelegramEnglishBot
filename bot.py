@@ -126,6 +126,8 @@ def menu_handler(bot, update, message, student):
     student.on_stage = len(sub.answers)
     student.save()
     message.reply_text(task.data["instructions"])
+    if task.text !='':
+        message.reply_text(task.text)
     show_task(bot, update, message, student)
 
 
