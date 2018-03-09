@@ -27,7 +27,7 @@ def registered(func):
                                         'Try again.')
             else:
                 message.reply_text(f'Welcome, {student.name}!\n'+
-                                    'Dear students, there is a Beta-version of the Bot now. So, please, be attentive to spaces, register and all of the punctuation marks in your answers. It is better to copy-paste fragments from tasks into your answers. Also, please, answer on the task with puzzle just by one number or word. If you have any question, write here @eugeniaustinova')
+                                    'There is a Beta-version of the Bot now. So, please, be attentive to spaces, register and all of the punctuation marks in your answers. It is better to copy-paste fragments from tasks into your answers. Also, please, answer on the task with puzzle just by one number or word. If you have any question, write to @eugeniaustinova')
                 show_help(bot, update)
                 show_menu(bot, update)
         else:
