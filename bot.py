@@ -90,6 +90,10 @@ def task_handler(bot, update, message, student):
     
 @registered
 def show_menu(bot, update, message, student):
+    if student.on_task:
+        student.on_task = None
+        student.on_stage = None
+        student.save()
     completed = Task.select().join(Submission).where((Submission.student == student) & Submission.is_completed)
     available_tasks = Task.select().where((Task.available_at <= datetime.now().date()) &
                                             (Task.due_to >= datetime.now().date()) &
