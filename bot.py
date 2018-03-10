@@ -109,8 +109,9 @@ def show_menu(bot, update, message, student):
         message.reply_text('No tasks to solve.\nCome back next week!')
 
 def menu_handler(bot, update, message, student):
+    query = update.callback_query
     try:
-        task = Task[update.callback_query.data]
+        task = Task[query.data]
     except Task.DoesNotExist:
         message.reply_text('Invalid task')
         return
@@ -126,6 +127,9 @@ def menu_handler(bot, update, message, student):
         message.reply_text('You have already completed this task!')
         return
 
+    bot.edit_message_text(text=f"Selected task: {task.data['type']}",
+                                  chat_id=query.message.chat_id,
+                                  message_id=query.message.message_id)
     student.on_task = task
     student.on_stage = len(sub.answers)
     student.save()
