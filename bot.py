@@ -70,6 +70,9 @@ def task_handler(bot, update, message, student):
     sub.answers.append(student_answer)
     sub.save()
 
+    message.reply_text(text="Your answer:")
+    message.reply_text(text=student_answer)
+
     if student_answer in block["correct"]:
         message.reply_text(text="That's right :)")
     else:
