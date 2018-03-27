@@ -48,8 +48,8 @@ def show_task(bot, update, message, student):
     block = task.data['blocks'][student.on_stage]
     markup = None
     if 'answers' in block.keys():
-        markup = InlineKeyboardMarkup([[InlineKeyboardButton(answer, callback_data=answer)
-                                            for answer in block['answers']]])
+        markup = InlineKeyboardMarkup([[InlineKeyboardButton(answer, callback_data=answer)]
+                                            for answer in block['answers']])
     message.reply_text(block['text'], reply_markup=markup)
 
 def task_handler(bot, update, message, student):
